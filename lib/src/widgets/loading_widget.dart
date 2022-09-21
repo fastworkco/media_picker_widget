@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../media_picker_widget.dart';
 
 class LoadingWidget extends StatelessWidget {
-  LoadingWidget({required this.decoration});
+  LoadingWidget({ this.decoration});
 
   final PickerDecoration decoration;
 

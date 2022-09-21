@@ -9,17 +9,21 @@ import 'loading_widget.dart';
 
 class MediaTile extends StatefulWidget {
   MediaTile({
-    Key? key,
-    required this.media,
-    required this.onSelected,
+    Key key,
+    this.media,
+    this.onSelected,
     this.isSelected = false,
     this.decoration,
+    this.maxImage,
+    this.currentImageCount,
   }) : super(key: key);
 
   final AssetEntity media;
   final Function(bool, Media) onSelected;
   final bool isSelected;
-  final PickerDecoration? decoration;
+  final PickerDecoration decoration;
+  final int maxImage;
+  final int currentImageCount;
 
   @override
   _MediaTileState createState() => _MediaTileState();
@@ -27,22 +31,22 @@ class MediaTile extends StatefulWidget {
 
 class _MediaTileState extends State<MediaTile>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
-  bool? selected;
+  bool selected;
 
-  Media? media;
+  Media media;
 
   Duration _duration = Duration(milliseconds: 100);
-  AnimationController? _animationController;
-  Animation? _animation;
+  AnimationController _animationController;
+  Animation _animation;
 
   @override
   void initState() {
     _animationController =
         AnimationController(vsync: this, duration: _duration);
     _animation =
-        Tween<double>(begin: 1.0, end: 1.3).animate(_animationController!);
+        Tween<double>(begin: 1.0, end: 1.3).animate(_animationController);
     selected = widget.isSelected;
-    if (selected!) _animationController!.forward();
+    if (selected) _animationController.forward();
     super.initState();
   }
 
@@ -55,39 +59,38 @@ class _MediaTileState extends State<MediaTile>
         child: Stack(
           children: [
             Positioned.fill(
-              child: media!.thumbnail != null
+              child: media.thumbnail != null
                   ? JumpingButton(
                       onTap: () {
-                        setState(() => selected = !selected!);
-                        if (selected!)
-                          _animationController!.forward();
+                        debugPrint('selectedMedias.length ${widget.currentImageCount} ');
+                        setState(() => selected = !selected);
+                        if (selected)
+                          _animationController.forward();
                         else
-                          _animationController!.reverse();
-                        widget.onSelected(selected!, media!);
+                          _animationController.reverse();
+                        widget.onSelected(selected, media);
                       },
                       child: Stack(
                         children: [
                           Positioned.fill(
                             child: ClipRect(
                               child: AnimatedBuilder(
-                                  animation: _animation!,
+                                  animation: _animation,
                                   builder: (context, child) {
                                     double amount =
-                                        (_animation!.value - 1) * 3.33;
+                                        (_animation.value - 1) * 3.33;
 
                                     return ImageFiltered(
                                       imageFilter: ImageFilter.blur(
-                                        sigmaX:
-                                            widget.decoration!.blurStrength *
-                                                amount,
-                                        sigmaY:
-                                            widget.decoration!.blurStrength *
-                                                amount,
+                                        sigmaX: widget.decoration.blurStrength *
+                                            amount,
+                                        sigmaY: widget.decoration.blurStrength *
+                                            amount,
                                       ),
                                       child: Transform.scale(
-                                        scale: _animation!.value,
+                                        scale: _animation.value,
                                         child: Image.memory(
-                                          media!.thumbnail!,
+                                          media.thumbnail,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -97,7 +100,7 @@ class _MediaTileState extends State<MediaTile>
                           ),
                           Positioned.fill(
                             child: AnimatedOpacity(
-                              opacity: selected! ? 1 : 0,
+                              opacity: selected ? 1 : 0,
                               curve: Curves.easeOut,
                               duration: _duration,
                               child: ClipRect(
@@ -136,7 +139,7 @@ class _MediaTileState extends State<MediaTile>
                 child: AnimatedOpacity(
                   curve: Curves.easeOut,
                   duration: _duration,
-                  opacity: selected! ? 1 : 0,
+                  opacity: selected ? 1 : 0,
                   child: Container(
                     decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
@@ -158,7 +161,7 @@ class _MediaTileState extends State<MediaTile>
       convertToMedia(media: widget.media)
           .then((_media) => setState(() => media = _media));
       return LoadingWidget(
-        decoration: widget.decoration!,
+        decoration: widget.decoration,
       );
     }
   }
@@ -167,7 +170,7 @@ class _MediaTileState extends State<MediaTile>
   bool get wantKeepAlive => true;
 }
 
-Future<Media> convertToMedia({required AssetEntity media}) async {
+Future<Media> convertToMedia({AssetEntity media}) async {
   Media convertedMedia = Media();
   convertedMedia.file = await media.file;
   convertedMedia.mediaByte = await media.originBytes;

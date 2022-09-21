@@ -7,20 +7,22 @@ import 'widgets/media_tile.dart';
 
 class MediaList extends StatefulWidget {
   MediaList({
-    required this.album,
-    required this.headerController,
-    required this.previousList,
+    this.album,
+    this.headerController,
+    this.previousList,
     this.mediaCount,
     this.decoration,
     this.scrollController,
+    this.maxImages,
   });
 
   final AssetPathEntity album;
   final HeaderController headerController;
   final List<Media> previousList;
-  final MediaCount? mediaCount;
-  final PickerDecoration? decoration;
-  final ScrollController? scrollController;
+  final MediaCount mediaCount;
+  final PickerDecoration decoration;
+  final ScrollController scrollController;
+  final int maxImages;
 
   @override
   _MediaListState createState() => _MediaListState();
@@ -29,8 +31,8 @@ class MediaList extends StatefulWidget {
 class _MediaListState extends State<MediaList> {
   List<Widget> _mediaList = [];
   int currentPage = 0;
-  int? lastPage;
-  AssetPathEntity? album;
+  int lastPage;
+  AssetPathEntity album;
 
   List<Media> selectedMedias = [];
 
@@ -40,7 +42,7 @@ class _MediaListState extends State<MediaList> {
     if (widget.mediaCount == MediaCount.multiple) {
       selectedMedias.addAll(widget.previousList);
       WidgetsBinding.instance.addPostFrameCallback(
-          (_) => widget.headerController.updateSelection!(selectedMedias));
+          (_) => widget.headerController.updateSelection(selectedMedias));
     }
     _fetchNewMedia();
     super.initState();
@@ -58,7 +60,7 @@ class _MediaListState extends State<MediaList> {
         controller: widget.scrollController,
         itemCount: _mediaList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: widget.decoration!.columnCount),
+            crossAxisCount: widget.decoration.columnCount),
         itemBuilder: (BuildContext context, int index) {
           return _mediaList[index];
         },
@@ -68,7 +70,7 @@ class _MediaListState extends State<MediaList> {
 
   _resetAlbum() {
     if (album != null) {
-      if (album!.id != widget.album.id) {
+      if (album.id != widget.album.id) {
         _mediaList.clear();
         album = widget.album;
         currentPage = 0;
@@ -91,22 +93,25 @@ class _MediaListState extends State<MediaList> {
     if (result == PermissionState.authorized ||
         result == PermissionState.limited) {
       List<AssetEntity> media =
-          await album!.getAssetListPaged(page: currentPage, size: 60);
+          await album.getAssetListPaged(page: currentPage, size: 60);
       List<Widget> temp = [];
-
       for (var asset in media) {
         temp.add(MediaTile(
           media: asset,
           onSelected: (isSelected, media) {
-            if (isSelected)
+            bool rechedMaxImage = selectedMedias.length >= widget.maxImages;
+            if (isSelected && !rechedMaxImage) {
               setState(() => selectedMedias.add(media));
-            else
+            } else {
               setState(() => selectedMedias
                   .removeWhere((_media) => _media.id == media.id));
-            widget.headerController.updateSelection!(selectedMedias);
+            }
+            widget.headerController.updateSelection(selectedMedias);
           },
           isSelected: isPreviouslySelected(asset),
           decoration: widget.decoration,
+          currentImageCount: selectedMedias.length,
+          maxImage: widget.maxImages,
         ));
       }
 

@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 class JumpingButton extends StatefulWidget {
   const JumpingButton({
-    Key? key,
-    required this.child,
+    Key key,
+    this.child,
     this.onTap,
     this.scale = 0.1,
     this.haptic = false,
@@ -15,22 +15,21 @@ class JumpingButton extends StatefulWidget {
 
   final Widget child;
   final bool dismissKeyboard;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
   final double scale;
   final bool haptic;
-  final double? clipRadius;
+  final double clipRadius;
   final bool bound;
 
   @override
   _JumpingButtonState createState() => _JumpingButtonState();
 }
 
-class _JumpingButtonState extends State<JumpingButton>
-    with SingleTickerProviderStateMixin {
-  late double _scale;
-  late AnimationController _controller;
+class _JumpingButtonState extends State<JumpingButton> with SingleTickerProviderStateMixin {
+  double _scale;
+  AnimationController _controller;
 
-  late bool enabled;
+  bool enabled;
 
   double radius = 0;
 
@@ -61,15 +60,12 @@ class _JumpingButtonState extends State<JumpingButton>
     if (widget.clipRadius != null) radius = _controller.value * 300;
 
     Widget child = widget.child;
-    if (widget.bound)
-      child =
-          ClipRRect(borderRadius: BorderRadius.circular(radius), child: child);
+    if (widget.bound) child = ClipRRect(borderRadius: BorderRadius.circular(radius), child: child);
 
     return Listener(
       onPointerDown: (_) {
         if (enabled) {
-          if (widget.dismissKeyboard)
-            FocusManager.instance.primaryFocus?.unfocus();
+          if (widget.dismissKeyboard) FocusManager.instance.primaryFocus?.unfocus();
           _controller.forward();
           if (widget.haptic) HapticFeedback.lightImpact();
         }

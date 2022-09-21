@@ -8,11 +8,7 @@ import '../media_picker_widget.dart';
 import 'widgets/loading_widget.dart';
 
 class AlbumSelector extends StatefulWidget {
-  AlbumSelector(
-      {required this.onSelect,
-      required this.albums,
-      required this.panelController,
-      required this.decoration});
+  AlbumSelector({this.onSelect, this.albums, this.panelController, this.decoration});
 
   final ValueChanged<AssetPathEntity> onSelect;
   final List<AssetPathEntity> albums;
@@ -52,8 +48,7 @@ class _AlbumSelectorState extends State<AlbumSelector> {
 }
 
 class AlbumTile extends StatefulWidget {
-  AlbumTile(
-      {required this.album, required this.onSelect, required this.decoration});
+  AlbumTile({this.album, this.onSelect, this.decoration});
 
   final AssetPathEntity album;
   final VoidCallback onSelect;
@@ -64,7 +59,7 @@ class AlbumTile extends StatefulWidget {
 }
 
 class _AlbumTileState extends State<AlbumTile> {
-  Uint8List? albumThumb;
+  Uint8List albumThumb;
   bool hasError = false;
 
   @override
@@ -93,7 +88,7 @@ class _AlbumTileState extends State<AlbumTile> {
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.memory(
-                              albumThumb!,
+                              albumThumb,
                               fit: BoxFit.cover,
                             ),
                           )
@@ -113,19 +108,14 @@ class _AlbumTileState extends State<AlbumTile> {
               ),
               Text(
                 widget.album.name,
-                style: widget.decoration.albumTextStyle ??
-                    TextStyle(color: Colors.black, fontSize: 18),
+                style: widget.decoration.albumTextStyle ?? TextStyle(color: Colors.black, fontSize: 18),
               ),
               SizedBox(
                 width: 5,
               ),
               Text(
                 '${widget.album.assetCount}',
-                style: widget.decoration.albumCountTextStyle ??
-                    TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400),
+                style: widget.decoration.albumCountTextStyle ?? TextStyle(color: Colors.grey.shade600, fontSize: 12, fontWeight: FontWeight.w400),
               ),
             ],
           ),
@@ -136,8 +126,7 @@ class _AlbumTileState extends State<AlbumTile> {
 
   _getAlbumThumb(AssetPathEntity album) async {
     List<AssetEntity> media = await album.getAssetListPaged(page: 0, size: 1);
-    Uint8List? _thumbByte =
-        await media[0].thumbnailDataWithSize(ThumbnailSize(80, 80));
+    Uint8List _thumbByte = await media[0].thumbnailDataWithSize(ThumbnailSize(80, 80));
     if (_thumbByte != null)
       setState(() => albumThumb = _thumbByte);
     else

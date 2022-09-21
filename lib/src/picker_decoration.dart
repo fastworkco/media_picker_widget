@@ -3,7 +3,7 @@ part of media_picker_widget;
 ///[PickerDecoration] is used for decorating the UI
 class PickerDecoration {
   ///Widget that will work as back button in picker
-  Widget? cancelIcon;
+  Widget cancelIcon;
 
   ///Blur amount on select media
   double blurStrength;
@@ -15,25 +15,25 @@ class PickerDecoration {
   ActionBarPosition actionBarPosition;
 
   ///Album title text style
-  TextStyle? albumTitleStyle;
+  TextStyle albumTitleStyle;
 
   ///Album text text style
-  TextStyle? albumTextStyle;
+  TextStyle albumTextStyle;
 
   ///Album's media count text style
-  TextStyle? albumCountTextStyle;
+  TextStyle albumCountTextStyle;
 
   ///text of select button
   String completeText;
 
   ///text style of select button
-  TextStyle? completeTextStyle;
+  TextStyle completeTextStyle;
 
   ///style of select button
-  ButtonStyle? completeButtonStyle;
+  ButtonStyle completeButtonStyle;
 
   ///loading widget to be used as media place holder until media loads
-  Widget? loadingWidget;
+  Widget loadingWidget;
 
   ///PickerDecoration constructor to be used for decorating the UI
   PickerDecoration({
